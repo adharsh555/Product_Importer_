@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { apiUrl } from "../services/api";
+
 
 export default function Webhooks() {
   // Backend root URL from .env
@@ -15,7 +17,7 @@ export default function Webhooks() {
   // --------------------- LOAD WEBHOOKS ---------------------
   async function load() {
     try {
-      const res = await axios.get(`${API}/webhooks`);
+      const res = await axios.get(`${apiUrl}/webhooks`);
       setHooks(res.data || []);
     } catch (err) {
       console.error(err);
@@ -30,7 +32,7 @@ export default function Webhooks() {
   // --------------------- ADD WEBHOOK ---------------------
   async function add() {
     try {
-      await axios.post(`${API}/webhooks`, form);
+      await axios.post(`${apiUrl}/webhooks`, form);
 
       // reset form
       setForm({
@@ -48,7 +50,7 @@ export default function Webhooks() {
   // --------------------- TEST WEBHOOK ---------------------
   async function test(id) {
     try {
-      const res = await axios.post(`${API}/webhooks/${id}/test`);
+      const res = await axios.post(`${apiUrl}/webhooks/${id}/test`);
       alert("Test response: " + JSON.stringify(res.data));
     } catch (e) {
       alert("Failed: " + (e.response?.data?.detail || e.message));
@@ -59,7 +61,7 @@ export default function Webhooks() {
   async function del(id) {
     if (!confirm("Delete this webhook?")) return;
     try {
-      await axios.delete(`${API}webhooks/${id}`);
+      await axios.delete(`${apiUrl}/webhooks/${id}`);
       load();
     } catch (e) {
       alert("Failed: " + (e.response?.data?.detail || e.message));

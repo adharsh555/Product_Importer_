@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { apiUrl } from "../services/api";
 
 // ------------------------- MODAL COMPONENT -------------------------
 function Modal({ open, onClose, onSubmit, initial }) {
@@ -77,7 +78,7 @@ function Modal({ open, onClose, onSubmit, initial }) {
 // ------------------------- PRODUCTS PAGE -------------------------
 export default function Products() {
   // Backend URL from Vite .env
-  const API = import.meta.env.VITE_API_URL;
+  
 
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(0);
@@ -107,7 +108,7 @@ export default function Products() {
     if (filters.active !== "") params.active = filters.active;
 
     try {
-      const res = await axios.get(`${API}products`, { params });
+      const res = await axios.get(`${apiUrl}/products`, { params });
       setProducts(res.data || []);
     } catch (e) {
       alert("Failed to fetch: " + (e.response?.data?.detail || e.message));
@@ -125,7 +126,7 @@ export default function Products() {
     setStatus("Deleting all products...");
 
     try {
-      await axios.delete(`${API}/products?confirm=true`);
+      await axios.delete(`${apiUrl}/products?confirm=true`);
       alert("All products deleted successfully!");
       fetchProducts();
       setStatus("");
@@ -150,10 +151,10 @@ export default function Products() {
     try {
       if (modalInitial) {
         // Edit product
-        await axios.put(`${API}/products/${encodeURIComponent(modalInitial.sku)}`, form);
+        await axios.put(`${apiUrl}/products/${encodeURIComponent(modalInitial.sku)}`, form);
       } else {
         // Create product
-        await axios.post(`${API}/products`, form);
+        await axios.post(`${apiUrl}/products`, form);
       }
       setModalOpen(false);
       fetchProducts();
@@ -167,7 +168,7 @@ export default function Products() {
     if (!window.confirm(`Delete product ${p.sku}?`)) return;
 
     try {
-      await axios.delete(`${API}/products/${encodeURIComponent(p.sku)}`);
+      await axios.delete(`${apiUrl}/products/${encodeURIComponent(p.sku)}`);
       fetchProducts();
     } catch (e) {
       alert("Delete failed: " + (e.response?.data?.detail || e.message));

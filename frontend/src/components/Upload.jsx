@@ -1,9 +1,10 @@
 import React, { useState, useRef } from "react";
 import axios from "axios";
+import { apiUrl } from "../services/api";
 
 export default function Upload() {
   // Backend root: must be like → https://product-importer-production-xxxx.up.railway.app/api
-  const API = import.meta.env.VITE_API_URL;
+  
 
   const [progress, setProgress] = useState(null);
   const [status, setStatus] = useState("");
@@ -16,7 +17,7 @@ export default function Upload() {
     setLastError(null);
 
     try {
-      const res = await axios.post(`${API}upload`, form, {
+      const res = await axios.post(`${apiUrl}/upload`, form, {
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (ev) => {
           if (ev.total) {
@@ -57,7 +58,7 @@ export default function Upload() {
       }
 
       // 🔥 IMPORTANT: SSE must use the FULL API URL
-      const es = new EventSource(`${API}/events/${upload_id}`);
+      const es = new EventSource(`${apiUrl}/events/${upload_id}`);
       esRef.current = es;
 
       es.onmessage = (ev) => {
