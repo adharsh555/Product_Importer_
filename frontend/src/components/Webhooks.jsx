@@ -5,7 +5,6 @@ import { apiUrl } from "../services/api";
 
 export default function Webhooks() {
   // Backend root URL from .env
-  const API = import.meta.env.VITE_API_URL;
 
   const [hooks, setHooks] = useState([]);
   const [form, setForm] = useState({
@@ -17,7 +16,7 @@ export default function Webhooks() {
   // --------------------- LOAD WEBHOOKS ---------------------
   async function load() {
     try {
-      const res = await axios.get(`${apiUrl}/webhooks`);
+      const res = await axios.get(`${apiUrl}/api/webhooks`);
       setHooks(res.data || []);
     } catch (err) {
       console.error(err);
@@ -32,7 +31,7 @@ export default function Webhooks() {
   // --------------------- ADD WEBHOOK ---------------------
   async function add() {
     try {
-      await axios.post(`${apiUrl}/webhooks`, form);
+      await axios.post(`${apiUrl}/api/webhooks`, form);
 
       // reset form
       setForm({
@@ -50,7 +49,7 @@ export default function Webhooks() {
   // --------------------- TEST WEBHOOK ---------------------
   async function test(id) {
     try {
-      const res = await axios.post(`${apiUrl}/webhooks/${id}/test`);
+      const res = await axios.post(`${apiUrl}/api/webhooks/${id}/test`);
       alert("Test response: " + JSON.stringify(res.data));
     } catch (e) {
       alert("Failed: " + (e.response?.data?.detail || e.message));
@@ -61,7 +60,7 @@ export default function Webhooks() {
   async function del(id) {
     if (!confirm("Delete this webhook?")) return;
     try {
-      await axios.delete(`${apiUrl}/webhooks/${id}`);
+      await axios.delete(`${apiUrl}/api/webhooks/${id}`);
       load();
     } catch (e) {
       alert("Failed: " + (e.response?.data?.detail || e.message));

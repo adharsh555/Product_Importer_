@@ -108,7 +108,7 @@ export default function Products() {
     if (filters.active !== "") params.active = filters.active;
 
     try {
-      const res = await axios.get(`${apiUrl}/products`, { params });
+      const res = await axios.get(`${apiUrl}/api/products`, { params });
       setProducts(res.data || []);
     } catch (e) {
       alert("Failed to fetch: " + (e.response?.data?.detail || e.message));
@@ -126,7 +126,7 @@ export default function Products() {
     setStatus("Deleting all products...");
 
     try {
-      await axios.delete(`${apiUrl}/products?confirm=true`);
+      await axios.delete(`${apiUrl}/api/products?confirm=true`);
       alert("All products deleted successfully!");
       fetchProducts();
       setStatus("");
@@ -151,10 +151,10 @@ export default function Products() {
     try {
       if (modalInitial) {
         // Edit product
-        await axios.put(`${apiUrl}/products/${encodeURIComponent(modalInitial.sku)}`, form);
+        await axios.put(`${apiUrl}/api/products/${encodeURIComponent(modalInitial.sku)}`, form);
       } else {
         // Create product
-        await axios.post(`${apiUrl}/products`, form);
+        await axios.post(`${apiUrl}/api/products`, form);
       }
       setModalOpen(false);
       fetchProducts();
@@ -168,7 +168,7 @@ export default function Products() {
     if (!window.confirm(`Delete product ${p.sku}?`)) return;
 
     try {
-      await axios.delete(`${apiUrl}/products/${encodeURIComponent(p.sku)}`);
+      await axios.delete(`${apiUrl}/api/products/${encodeURIComponent(p.sku)}`);
       fetchProducts();
     } catch (e) {
       alert("Delete failed: " + (e.response?.data?.detail || e.message));

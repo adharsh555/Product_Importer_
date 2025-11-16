@@ -17,7 +17,7 @@ export default function Upload() {
     setLastError(null);
 
     try {
-      const res = await axios.post(`${apiUrl}/upload`, form, {
+      const res = await axios.post(`${apiUrl}/api/upload`, form, {
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (ev) => {
           if (ev.total) {
@@ -58,7 +58,7 @@ export default function Upload() {
       }
 
       // 🔥 IMPORTANT: SSE must use the FULL API URL
-      const es = new EventSource(`${apiUrl}/events/${upload_id}`);
+      const es = new EventSource(`${apiUrl}/api/events/${upload_id}`);
       esRef.current = es;
 
       es.onmessage = (ev) => {
