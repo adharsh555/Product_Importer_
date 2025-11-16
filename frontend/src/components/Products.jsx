@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+// ------------------------- MODAL COMPONENT -------------------------
 function Modal({ open, onClose, onSubmit, initial }) {
   const [form, setForm] = useState(
     initial || { sku: "", name: "", description: "", price: "", active: true }
@@ -52,7 +53,6 @@ function Modal({ open, onClose, onSubmit, initial }) {
             onChange={(e) => setForm({ ...form, price: e.target.value })}
             style={{ width: "100%", marginBottom: 6 }}
           />
-
           <label>
             <input
               type="checkbox"
@@ -74,9 +74,10 @@ function Modal({ open, onClose, onSubmit, initial }) {
   );
 }
 
+// ------------------------- PRODUCTS PAGE -------------------------
 export default function Products() {
-
-  const API = import.meta.env.VITE_API_URL;   // ✅ IMPORTANT
+  // Backend URL from Vite .env
+  const API = import.meta.env.VITE_API_URL;
 
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(0);
@@ -93,7 +94,7 @@ export default function Products() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalInitial, setModalInitial] = useState(null);
 
-  // ------------------ FETCH ------------------
+  // ------------------------- FETCH PRODUCTS -------------------------
   async function fetchProducts() {
     const params = {
       skip: page * limit,
@@ -106,7 +107,7 @@ export default function Products() {
     if (filters.active !== "") params.active = filters.active;
 
     try {
-      const res = await axios.get(`${API}/products`, { params });   // ✅ FIXED
+      const res = await axios.get(`${API}/products`, { params });
       setProducts(res.data || []);
     } catch (e) {
       alert("Failed to fetch: " + (e.response?.data?.detail || e.message));
@@ -115,31 +116,26 @@ export default function Products() {
 
   useEffect(() => {
     fetchProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
-  // ------------------ DELETE ALL ------------------
+  // ------------------------- DELETE ALL -------------------------
   async function handleDeleteAll() {
-    if (!window.confirm("Are you sure you want to delete ALL products? This cannot be undone.")) {
-      return;
-    }
+    if (!window.confirm("Are you sure you want to delete ALL products?")) return;
 
     setStatus("Deleting all products...");
 
     try {
-      await axios.delete(`${API}/products?confirm=true`);   // ✅ FIXED
+      await axios.delete(`${API}/products?confirm=true`);
       alert("All products deleted successfully!");
-
       fetchProducts();
       setStatus("");
     } catch (err) {
-      console.error(err);
-      alert("Failed to delete products: " + err.message);
+      alert("Failed to delete: " + err.message);
       setStatus("");
     }
   }
 
-  // ------------------ MODAL ACTIONS ------------------
+  // ------------------------- MODAL ACTIONS -------------------------
   function createProductModal() {
     setModalInitial(null);
     setModalOpen(true);
@@ -153,9 +149,11 @@ export default function Products() {
   async function onModalSubmit(form) {
     try {
       if (modalInitial) {
-        await axios.put(`${API}/products/${encodeURIComponent(modalInitial.sku)}`, form);   // FIXED
+        // Edit product
+        await axios.put(`${API}/products/${encodeURIComponent(modalInitial.sku)}`, form);
       } else {
-        await axios.post(`${API}/products`, form);   // FIXED
+        // Create product
+        await axios.post(`${API}/products`, form);
       }
       setModalOpen(false);
       fetchProducts();
@@ -164,18 +162,19 @@ export default function Products() {
     }
   }
 
-  // ------------------ DELETE SINGLE ------------------
+  // ------------------------- DELETE SINGLE PRODUCT -------------------------
   async function deleteProduct(p) {
     if (!window.confirm(`Delete product ${p.sku}?`)) return;
 
     try {
-      await axios.delete(`${API}/products/${encodeURIComponent(p.sku)}`);   // FIXED
+      await axios.delete(`${API}/products/${encodeURIComponent(p.sku)}`);
       fetchProducts();
     } catch (e) {
       alert("Delete failed: " + (e.response?.data?.detail || e.message));
     }
   }
 
+  // ------------------------- UI -------------------------
   return (
     <div>
       <h2>Products</h2>
@@ -183,7 +182,6 @@ export default function Products() {
       {status && <div style={{ marginBottom: 10, color: "blue" }}>{status}</div>}
 
       <div style={{ marginBottom: 10 }}>
-
         <input
           placeholder="SKU"
           value={filters.sku}
@@ -237,7 +235,7 @@ export default function Products() {
         </button>
       </div>
 
-
+      {/* TABLE */}
       <table border="1" cellPadding="6" style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
@@ -269,18 +267,22 @@ export default function Products() {
 
           {products.length === 0 && (
             <tr>
-              <td colSpan={6} style={{ textAlign: "center" }}>No products</td>
+              <td colSpan={6} style={{ textAlign: "center" }}>
+                No products
+              </td>
             </tr>
           )}
         </tbody>
       </table>
 
+      {/* Pagination */}
       <div style={{ marginTop: 10 }}>
         <button onClick={() => page > 0 && setPage((p) => p - 1)}>Prev</button>
         <span style={{ margin: "0 10px" }}>Page {page + 1}</span>
         <button onClick={() => setPage((p) => p + 1)}>Next</button>
       </div>
 
+      {/* Modal */}
       <Modal
         open={modalOpen}
         initial={modalInitial}

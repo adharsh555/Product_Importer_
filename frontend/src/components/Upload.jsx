@@ -2,19 +2,21 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 
 export default function Upload() {
-  const API = import.meta.env.VITE_API_URL;   // ✅ IMPORTANT
+  // Backend root: must be like → https://product-importer-production-xxxx.up.railway.app/api
+  const API = import.meta.env.VITE_API_URL;
 
   const [progress, setProgress] = useState(null);
   const [status, setStatus] = useState("");
   const [lastError, setLastError] = useState(null);
   const esRef = useRef(null);
 
+  // ------------------------- UPLOAD FUNCTION -------------------------
   async function doUpload(form) {
     setStatus("Uploading file...");
     setLastError(null);
 
     try {
-      const res = await axios.post(`${API}/upload`, form, {   // ✅ FIXED
+      const res = await axios.post(`${API}/upload`, form, {
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (ev) => {
           if (ev.total) {
@@ -33,11 +35,12 @@ export default function Upload() {
     }
   }
 
+  // ------------------------- HANDLE FORM SUBMIT -------------------------
   async function handleSubmit(e) {
     e.preventDefault();
 
     const file = e.target.file.files[0];
-    if (!file) return alert("Choose csv");
+    if (!file) return alert("Choose CSV file");
 
     const form = new FormData();
     form.append("file", file);
@@ -49,9 +52,11 @@ export default function Upload() {
       setStatus("File uploaded. Processing started...");
       setProgress(null);
 
-      if (esRef.current) esRef.current.close();
+      if (esRef.current) {
+        esRef.current.close();
+      }
 
-      // ✅ FIXED SSE URL
+      // 🔥 IMPORTANT: SSE must use the FULL API URL
       const es = new EventSource(`${API}/events/${upload_id}`);
       esRef.current = es;
 
@@ -80,9 +85,12 @@ export default function Upload() {
         setStatus("EventSource error");
       };
 
-    } catch (err) {}
+    } catch (err) {
+      // error already shown in doUpload()
+    }
   }
 
+  // ------------------------- RENDER -------------------------
   return (
     <div>
       <h2>Upload CSV</h2>

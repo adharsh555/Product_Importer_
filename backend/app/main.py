@@ -15,19 +15,24 @@ app = FastAPI(title="Acme Product Importer")
 def health():
     return {"status": "ok"}
 
+# IMPORTANT — your real frontend domain:
+FRONTEND_URL = "https://product-importer-csv-production.up.railway.app"
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",
-        "https://product-importer-csv-production.up.railway.app",
+        "http://localhost:5173",   # local dev
+        FRONTEND_URL,              # deployed frontend
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Initialize DB models
 Base.metadata.create_all(bind=engine)
 
+# Routes
 app.include_router(upload_router, prefix="/api")
 app.include_router(products_router, prefix="/api")
 app.include_router(webhooks_router, prefix="/api")
