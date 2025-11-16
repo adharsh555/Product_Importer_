@@ -2,10 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { apiUrl } from "../services/api";
 
-
 export default function Webhooks() {
-  // Backend root URL from .env
-
   const [hooks, setHooks] = useState([]);
   const [form, setForm] = useState({
     url: "",
@@ -33,7 +30,6 @@ export default function Webhooks() {
     try {
       await axios.post(`${apiUrl}/api/webhooks`, form);
 
-      // reset form
       setForm({
         url: "",
         event: "product.import",
@@ -69,54 +65,59 @@ export default function Webhooks() {
 
   // --------------------- RENDER ---------------------
   return (
-    <div className="card container">
-      <h2>Webhooks</h2>
+    <div className="webhooks-container">
+      <h2 className="webhooks-title">Webhooks</h2>
 
       {/* Create Webhook Form */}
-      <div style={{ marginBottom: 8 }}>
+      <div className="webhooks-form">
         <input
-          placeholder="URL"
+          className="webhook-input"
+          placeholder="Webhook URL"
           value={form.url}
           onChange={(e) => setForm({ ...form, url: e.target.value })}
         />
+
         <input
+          className="webhook-input"
           placeholder="Event"
           value={form.event}
           onChange={(e) => setForm({ ...form, event: e.target.value })}
         />
 
-        <label style={{ marginLeft: 8 }}>
+        <label className="checkbox-label">
           <input
             type="checkbox"
             checked={form.enabled}
             onChange={(e) => setForm({ ...form, enabled: e.target.checked })}
-          />{" "}
+          />
           Enabled
         </label>
 
-        <button onClick={add} style={{ marginLeft: 8 }}>
+        <button className="add-button" onClick={add}>
           Add
         </button>
       </div>
 
       {/* Webhook List */}
-      <ul>
+      <ul className="webhooks-list">
         {hooks.map((h) => (
-          <li key={h.id} style={{ marginBottom: 6 }}>
-            <strong>{h.id}:</strong> {h.url} ({h.event}) —{" "}
-            {h.enabled ? "enabled" : "disabled"}
-            <button onClick={() => test(h.id)} style={{ marginLeft: 8 }}>
-              Test
-            </button>
-            <button onClick={() => del(h.id)} style={{ marginLeft: 6 }}>
-              Delete
-            </button>
+          <li key={h.id} className="webhook-item">
+            <span>
+              <strong>{h.id}</strong>: {h.url} ({h.event}) — {h.enabled ? "Enabled" : "Disabled"}
+            </span>
+
+            <div className="button-group">
+              <button className="test-button" onClick={() => test(h.id)}>
+                Test
+              </button>
+              <button className="delete-button" onClick={() => del(h.id)}>
+                Delete
+              </button>
+            </div>
           </li>
         ))}
 
-        {hooks.length === 0 && (
-          <li>No webhooks found.</li>
-        )}
+        {hooks.length === 0 && <li>No webhooks found.</li>}
       </ul>
     </div>
   );

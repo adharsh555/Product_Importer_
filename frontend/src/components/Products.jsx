@@ -15,60 +15,54 @@ function Modal({ open, onClose, onSubmit, initial }) {
   if (!open) return null;
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.3)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 999
-      }}
-    >
-      <div style={{ background: "white", padding: 20, minWidth: 320, borderRadius: 4 }}>
+    <div className="modal-overlay">
+      <div className="modal-box">
         <h3>{initial ? "Edit Product" : "Create Product"}</h3>
 
-        <div style={{ marginTop: 10 }}>
-          <input
-            placeholder="SKU"
-            value={form.sku}
-            onChange={(e) => setForm({ ...form, sku: e.target.value })}
-            style={{ width: "100%", marginBottom: 6 }}
-          />
-          <input
-            placeholder="Name"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            style={{ width: "100%", marginBottom: 6 }}
-          />
-          <input
-            placeholder="Description"
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-            style={{ width: "100%", marginBottom: 6 }}
-          />
-          <input
-            placeholder="Price"
-            value={form.price}
-            onChange={(e) => setForm({ ...form, price: e.target.value })}
-            style={{ width: "100%", marginBottom: 6 }}
-          />
-          <label>
-            <input
-              type="checkbox"
-              checked={form.active}
-              onChange={(e) => setForm({ ...form, active: e.target.checked })}
-            />{" "}
-            Active
-          </label>
-        </div>
+        <input
+          className="modal-input"
+          placeholder="SKU"
+          value={form.sku}
+          onChange={(e) => setForm({ ...form, sku: e.target.value })}
+        />
 
-        <div style={{ marginTop: 12 }}>
-          <button onClick={() => onSubmit(form)} style={{ marginRight: 8 }}>
+        <input
+          className="modal-input"
+          placeholder="Name"
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+        />
+
+        <input
+          className="modal-input"
+          placeholder="Description"
+          value={form.description}
+          onChange={(e) => setForm({ ...form, description: e.target.value })}
+        />
+
+        <input
+          className="modal-input"
+          placeholder="Price"
+          value={form.price}
+          onChange={(e) => setForm({ ...form, price: e.target.value })}
+        />
+
+        <label>
+          <input
+            type="checkbox"
+            checked={form.active}
+            onChange={(e) => setForm({ ...form, active: e.target.checked })}
+          />
+          {" "}Active
+        </label>
+
+        <div className="modal-actions">
+          <button className="save-button" onClick={() => onSubmit(form)}>
             Save
           </button>
-          <button onClick={onClose}>Cancel</button>
+          <button className="cancel-button" onClick={onClose}>
+            Cancel
+          </button>
         </div>
       </div>
     </div>
@@ -77,9 +71,6 @@ function Modal({ open, onClose, onSubmit, initial }) {
 
 // ------------------------- PRODUCTS PAGE -------------------------
 export default function Products() {
-  // Backend URL from Vite .env
-  
-
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(0);
   const [limit] = useState(25);
@@ -150,10 +141,8 @@ export default function Products() {
   async function onModalSubmit(form) {
     try {
       if (modalInitial) {
-        // Edit product
         await axios.put(`${apiUrl}/api/products/${encodeURIComponent(modalInitial.sku)}`, form);
       } else {
-        // Create product
         await axios.post(`${apiUrl}/api/products`, form);
       }
       setModalOpen(false);
@@ -163,7 +152,6 @@ export default function Products() {
     }
   }
 
-  // ------------------------- DELETE SINGLE PRODUCT -------------------------
   async function deleteProduct(p) {
     if (!window.confirm(`Delete product ${p.sku}?`)) return;
 
@@ -177,29 +165,36 @@ export default function Products() {
 
   // ------------------------- UI -------------------------
   return (
-    <div>
-      <h2>Products</h2>
+    <div className="products-container">
+      <h2 className="products-title">Products</h2>
 
-      {status && <div style={{ marginBottom: 10, color: "blue" }}>{status}</div>}
+      {status && <div className="status-message">{status}</div>}
 
-      <div style={{ marginBottom: 10 }}>
+      {/* Filters */}
+      <div className="filter-row">
         <input
+          className="products-input"
           placeholder="SKU"
           value={filters.sku}
           onChange={(e) => setFilters({ ...filters, sku: e.target.value })}
         />
+
         <input
+          className="products-input"
           placeholder="Name"
           value={filters.name}
           onChange={(e) => setFilters({ ...filters, name: e.target.value })}
         />
+
         <input
+          className="products-input"
           placeholder="Description"
           value={filters.description}
           onChange={(e) => setFilters({ ...filters, description: e.target.value })}
         />
 
         <select
+          className="products-select"
           value={filters.active}
           onChange={(e) => setFilters({ ...filters, active: e.target.value })}
         >
@@ -208,36 +203,29 @@ export default function Products() {
           <option value="false">Inactive</option>
         </select>
 
-        <button
-          onClick={() => {
-            setPage(0);
-            fetchProducts();
-          }}
-        >
+        <button className="products-button" onClick={() => { setPage(0); fetchProducts(); }}>
           Filter
         </button>
 
-        <button
-          onClick={() => {
-            setFilters({ sku: "", name: "", description: "", active: "" });
-            setPage(0);
-            fetchProducts();
-          }}
-        >
+        <button className="products-button clear-button" onClick={() => {
+          setFilters({ sku: "", name: "", description: "", active: "" });
+          setPage(0);
+          fetchProducts();
+        }}>
           Clear
         </button>
 
-        <button style={{ marginLeft: 12 }} onClick={createProductModal}>
+        <button className="products-button create-button" onClick={createProductModal}>
           Create
         </button>
 
-        <button style={{ marginLeft: 8, color: "red" }} onClick={handleDeleteAll}>
+        <button className="products-button delete-all-button" onClick={handleDeleteAll}>
           Delete All
         </button>
       </div>
 
-      {/* TABLE */}
-      <table border="1" cellPadding="6" style={{ width: "100%", borderCollapse: "collapse" }}>
+      {/* Table */}
+      <table className="products-table">
         <thead>
           <tr>
             <th>SKU</th>
@@ -258,8 +246,10 @@ export default function Products() {
               <td>{p.price}</td>
               <td>{String(p.active)}</td>
               <td>
-                <button onClick={() => editProductModal(p)}>Edit</button>
-                <button onClick={() => deleteProduct(p)} style={{ marginLeft: 6, color: "red" }}>
+                <button className="action-button" onClick={() => editProductModal(p)}>
+                  Edit
+                </button>
+                <button className="action-button delete-button" onClick={() => deleteProduct(p)}>
                   Delete
                 </button>
               </td>
@@ -277,19 +267,14 @@ export default function Products() {
       </table>
 
       {/* Pagination */}
-      <div style={{ marginTop: 10 }}>
+      <div className="pagination">
         <button onClick={() => page > 0 && setPage((p) => p - 1)}>Prev</button>
-        <span style={{ margin: "0 10px" }}>Page {page + 1}</span>
+        <span>Page {page + 1}</span>
         <button onClick={() => setPage((p) => p + 1)}>Next</button>
       </div>
 
       {/* Modal */}
-      <Modal
-        open={modalOpen}
-        initial={modalInitial}
-        onClose={() => setModalOpen(false)}
-        onSubmit={onModalSubmit}
-      />
+      <Modal open={modalOpen} initial={modalInitial} onClose={() => setModalOpen(false)} onSubmit={onModalSubmit} />
     </div>
   );
 }
