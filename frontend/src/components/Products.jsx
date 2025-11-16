@@ -107,7 +107,7 @@ export default function Products() {
     if (filters.active !== "") params.active = filters.active;
 
     try {
-      const res = await axios.get(`${API}/products`, { params });
+      const res = await axios.get(`${API}products`, { params });
       setProducts(res.data || []);
     } catch (e) {
       alert("Failed to fetch: " + (e.response?.data?.detail || e.message));

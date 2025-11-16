@@ -16,7 +16,7 @@ export default function Upload() {
     setLastError(null);
 
     try {
-      const res = await axios.post(`${API}/upload`, form, {
+      const res = await axios.post(`${API}upload`, form, {
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (ev) => {
           if (ev.total) {

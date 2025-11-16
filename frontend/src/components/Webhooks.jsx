@@ -59,7 +59,7 @@ export default function Webhooks() {
   async function del(id) {
     if (!confirm("Delete this webhook?")) return;
     try {
-      await axios.delete(`${API}/webhooks/${id}`);
+      await axios.delete(`${API}webhooks/${id}`);
       load();
     } catch (e) {
       alert("Failed: " + (e.response?.data?.detail || e.message));
