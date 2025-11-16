@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .db import engine, Base
-from . import models   # imports Product so Base.metadata knows it
+from . import models
 
 from .routes.upload import router as upload_router
 from .routes.products import router as products_router
@@ -15,16 +15,17 @@ app = FastAPI(title="Acme Product Importer")
 def health():
     return {"status": "ok"}
 
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://product-importer-csv-production.up.railway.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# MUST RUN AFTER MODELS IMPORT
 Base.metadata.create_all(bind=engine)
 
 app.include_router(upload_router, prefix="/api")
