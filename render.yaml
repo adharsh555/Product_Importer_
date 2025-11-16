@@ -1,8 +1,0 @@
-services:
-  - type: web
-    name: product-importer
-    env: docker
-    region: frankfurt
-    plan: starter
-    dockerfilePath: ./docker-compose.yml
-    autoDeploy: true
