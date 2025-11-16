@@ -1,81 +1,78 @@
 
 # Acme Product Importer
 
-A minimal, containerized product importer built with FastAPI, React, Celery, Redis, and PostgreSQL. Supports large CSV uploads (up to 500,000 records), real-time progress updates, product management, bulk deletion, and webhook configuration.
+**Live Demo**: https://product-importer-csv-production.up.railway.app/  
+**Repository**: https://github.com/adharsh555/Product_Importer
+
+A minimal, containerized product importer built with FastAPI, Celery, Redis, PostgreSQL, and a React + Vite frontend. Supports large CSV uploads, background processing with real-time progress (SSE), product CRUD, webhook notifications, and persistent file storage via volumes.
 
 ## Features
 
-- **Large CSV upload** with progress tracking
-- **Real-time status updates** using Redis Pub/Sub
-- **Automatic SKU-based upsert** (case-insensitive)
-- **Product CRUD** with filtering and pagination
-- **Bulk delete** with confirmation
-- **Webhook creation, editing, testing, and deletion**
-- **Fully containerized** with Docker Compose
+- **Streaming CSV upload** (memory-efficient, chunked)
+- **Background import** using Celery + Redis
+- **Real-time progress updates** via Server-Sent Events (SSE)
+- **SKU-based upsert** (create or update)
+- **Product listing** with pagination and CRUD
+- **Webhook configuration** + test endpoint
+- **Fully containerized** with Docker and deployable on Railway
+- **Persistent upload directory** using mounted volumes
 
 ## Tech Stack
 
-### Backend
-- FastAPI
-- SQLAlchemy
-- Celery
-- Redis
-- PostgreSQL
+**Backend**: FastAPI, SQLAlchemy, Celery  
+**Database**: PostgreSQL  
+**Broker/Worker**: Redis + Celery  
+**Frontend**: React (Vite)  
+**Deployment**: Docker, Railway
 
-### Frontend
-- React + Vite
-- Fetch API
-- Minimal CSS
+## Quick Start
 
-## Getting Started
+### Prerequisites
+- Python 3.9+, Node 16+, Docker + Docker Compose
 
-### 1. Install Docker Desktop
+### Local Development
 
-Download and install Docker Desktop from:  
-https://www.docker.com/products/docker-desktop/
-
-### 2. Clone the repository
-
+**Backend**:
 ```bash
-git clone https://github.com/<your-username>/acme-product-importer.git
-cd acme-product-importer
+python -m venv venv
+source venv/bin/activate
+pip install -r backend/requirements.txt
+docker-compose up -d postgres redis
+uvicorn backend.app.main:app --reload
+celery -A backend.app.celery_app.celery_app worker --loglevel=info -Q imports --pool=solo
 ```
 
-### 3. Start the application
-
+**Frontend**:
 ```bash
-docker compose up --build
+cd frontend
+npm install
+npm run dev
 ```
 
-### 4. Access the UI
-
-- **Frontend**: http://localhost:5173
-- **API Docs**: http://localhost:8000/docs
-
-## Project Structure
-
-```
-backend/     - FastAPI application, Celery tasks, database models  
-frontend/    - React UI (Vite)  
-docker-compose.yml
-```
-
-## Stopping Containers
-
+### Docker
 ```bash
-docker compose down
+docker-compose up --build
 ```
 
-To remove database + uploads:
+Access the UI at http://localhost:5173 and API docs at http://localhost:8000/docs.
 
+## Environment Variables
+
+**Backend**: `DATABASE_URL`, `REDIS_URL`, `UPLOAD_PATH`  
+**Frontend**: `VITE_API_URL=http://localhost:8000/api`
+
+## Deployment (Railway)
+
+Deploy backend with Dockerfile, attach PostgreSQL & Redis services, mount volume to `/tmp/uploads`, and set start command:
 ```bash
-docker compose down -v
+sh -c "uvicorn app.main:app --host 0.0.0.0 --port $PORT & celery -A app.celery_app.celery_app worker --loglevel=info -Q imports"
 ```
 
-## Notes
+Deploy frontend as Static Site from `frontend/` directory with build command `npm install && npm run build`.
 
-- Designed for handling very large CSV files without UI freeze
-- SKU uniqueness and overwrite logic are enforced
-- Webhook tester works with tools like webhook.site
-- Minimal UI kept intentionally simple for clarity and assignment requirements
+## Contact
+
+**Adharsh Ajay**  
+Email: adharshajay55@gmail.com  
+Phone: +91 8138090299
 
