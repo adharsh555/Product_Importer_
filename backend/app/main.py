@@ -11,6 +11,11 @@ from .routes.events import router as events_router
 
 app = FastAPI(title="Acme Product Importer")
 
+@app.get("/api/health")
+def health():
+    return {"status": "ok"}
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
