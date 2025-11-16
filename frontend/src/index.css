@@ -105,3 +105,300 @@ body { font-family: sans-serif; padding: 12px; }
 input, select, button { margin-right: 6px; padding: 6px; }
 button { cursor: pointer; }
 
+/* ------------ Upload Component Styles ------------ */
+
+.upload-container {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 480px;
+  border: 1px solid #e0e0e0;
+  margin: 20px 0;
+}
+
+.upload-title {
+  margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.upload-status {
+  margin-top: 12px;
+  font-size: 15px;
+  color: #444;
+  font-weight: 500;
+}
+
+.upload-button {
+  padding: 8px 16px;
+  background: #1976d2;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.retry-button {
+  padding: 6px 12px;
+  background: #d32f2f;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.progress-container {
+  width: 100%;
+  border: 1px solid #ccc;
+  margin-top: 10px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 16px;
+  background: #4caf50;
+  transition: width 0.3s ease;
+}
+
+.progress-bar.complete {
+  background: #2e7d32;
+}
+
+/* -------------------- Webhooks Component Styles -------------------- */
+
+.webhooks-container {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 600px;
+  border: 1px solid #e0e0e0;
+  margin: 20px 0;
+}
+
+.webhooks-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.webhooks-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.webhook-input {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  flex: 1;
+}
+
+.checkbox-label {
+  font-size: 14px;
+  color: #444;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.add-button {
+  padding: 8px 14px;
+  background: #1976d2;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.webhooks-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 10px;
+}
+
+.webhook-item {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.webhook-item strong {
+  color: #222;
+}
+
+.button-group {
+  display: flex;
+  gap: 6px;
+}
+
+.test-button {
+  padding: 6px 10px;
+  background: #0288d1;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.delete-button {
+  padding: 6px 10px;
+  background: #d32f2f;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* -------------------- Products Page -------------------- */
+
+.products-container {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  max-width: 900px;
+  margin: 20px auto;
+}
+
+.products-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.status-message {
+  font-size: 15px;
+  font-weight: 500;
+  color: #1a3e8d;
+  margin-bottom: 12px;
+}
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.products-input,
+.products-select {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.products-button {
+  padding: 7px 14px;
+  border: none;
+  background: #1976d2;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.clear-button {
+  background: #757575;
+}
+
+.create-button {
+  background: #2e7d32;
+}
+
+.delete-all-button {
+  background: #d32f2f;
+}
+
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.products-table th,
+.products-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.action-button {
+  padding: 6px 10px;
+  border: none;
+  background: #1976d2;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.delete-button {
+  background: #d32f2f;
+}
+
+.pagination {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* -------------------- Modal -------------------- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal-box {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 6px;
+  min-width: 340px;
+  border: 1px solid #ddd;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.modal-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.save-button {
+  background: #1976d2;
+  padding: 8px 14px;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancel-button {
+  background: #757575;
+  padding: 8px 14px;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
