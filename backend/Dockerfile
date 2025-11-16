@@ -10,7 +10,7 @@ COPY backend /app
 ENV PYTHONUNBUFFERED=1
 
 # IMPORTANT: Run FastAPI + Celery worker together
-CMD ["sh","-c","uvicorn app.main:app --host 0.0.0.0 --port $PORT & celery -A app.celery_app.celery_app worker --loglevel=info -Q imports"]
+CMD ["sh","-c","uvicorn app.main:app --host 0.0.0.0 --port $PORT & celery -A app.celery_app.celery_app worker --loglevel=info --pool=solo -Q imports --concurrency=1"]
 
 
 
