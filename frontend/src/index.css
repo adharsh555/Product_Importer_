@@ -1,0 +1,106 @@
+/* src/styles.css - plain, simple styling to replace Tailwind */
+:root{
+  --accent: #4caf50;
+  --muted: #666;
+  --border: #e0e0e0;
+  --bg: #fafafa;
+  --card: #fff;
+  --danger: #e74c3c;
+  --gap: 12px;
+}
+
+*{box-sizing:border-box;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+
+
+
+.container{
+  max-width:980px;
+  margin:0 auto;
+}
+
+h2{
+  margin:0 0 12px 0;
+  font-size:20px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:14px;
+  border-radius:8px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.03);
+}
+
+input[type="text"], input[type="file"], select, textarea{
+  padding:8px 10px;
+  border:1px solid var(--border);
+  border-radius:6px;
+  outline:none;
+  margin-right:8px;
+}
+
+input[type="text"]:focus, textarea:focus { box-shadow:0 0 0 3px rgba(76,175,80,0.08); border-color:var(--accent); }
+
+button{
+  padding:8px 12px;
+  border-radius:6px;
+  border:1px solid rgba(0,0,0,0.06);
+  background:#fff;
+  cursor:pointer;
+}
+
+button.primary{
+  background:var(--accent);
+  color:white;
+  border:none;
+}
+
+button.warn{
+  background:var(--danger);
+  color:white;
+  border:none;
+}
+
+.toolbar{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+}
+
+.table th, .table td{
+  text-align:left;
+  padding:8px 10px;
+  border-bottom:1px solid var(--border);
+  font-size:13px;
+}
+
+.progressWrapper{
+  width:400px;
+  border:1px solid var(--border);
+  margin-top:8px;
+}
+
+.progressBar{
+  height:16px;
+  background:var(--accent);
+  width:0%;
+  transition:width 200ms ease;
+  border-radius:4px;
+}
+.small{
+  font-size:13px;
+  color:var(--muted);
+}
+.center{
+  text-align:center;
+}
+body { font-family: sans-serif; padding: 12px; }
+input, select, button { margin-right: 6px; padding: 6px; }
+button { cursor: pointer; }
