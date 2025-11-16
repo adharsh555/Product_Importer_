@@ -47,12 +47,11 @@ export default function Upload() {
       const data = await doUpload(form);
       const upload_id = data.upload_id;
 
-      setStatus("File uploaded. Processing has started...");
+      setStatus("File uploaded. Processing started.");
       setProgress(null);
 
       if (esRef.current) esRef.current.close();
 
-      // Server-Sent Events (SSE)
       const es = new EventSource(`${apiUrl}/api/events/${upload_id}`);
       esRef.current = es;
 
@@ -67,63 +66,53 @@ export default function Upload() {
           } else {
             setStatus(d.status);
           }
-        } 
-        
-        // Processing complete
-        else if (d.status === "complete") {
+        } else if (d.status === "complete") {
           setProgress(100);
-          setStatus("Import completed. You can view the results on the Products page.");
+          setStatus("Import completed. You can now view the results in the Products section.");
           es.close();
-        } 
-        
-        // Processing error
-        else if (d.status === "error") {
+        } else if (d.status === "error") {
           setStatus("Error: " + d.message);
           es.close();
         }
       };
 
-      es.onerror = () => {
-        setStatus("Connection error while receiving updates.");
-      };
-
-    } catch (err) {
-      // Error already handled
-    }
+      es.onerror = () => setStatus("Connection error while receiving updates.");
+    } catch (err) {}
   }
 
   // ------------------------- RENDER -------------------------
   return (
-    <div>
-      <h2>Upload CSV</h2>
+    <div className="upload-container">
+      <h2 className="upload-title">Upload CSV</h2>
 
       <form onSubmit={handleSubmit}>
         <input type="file" name="file" accept=".csv" />
-        <button type="submit">Upload & Import</button>
+        <br /><br />
+        <button type="submit" className="upload-button">
+          Upload and Import
+        </button>
       </form>
 
-      <div style={{ marginTop: 10 }}>
-        <div style={{ fontWeight: "500" }}>{status}</div>
+      <div className="upload-status">{status}</div>
 
-        {lastError && (
-          <div style={{ marginTop: 8 }}>
-            <button onClick={() => setLastError(null)}>Retry Upload</button>
-          </div>
-        )}
+      {lastError && (
+        <button className="retry-button" onClick={() => setLastError(null)}>
+          Retry Upload
+        </button>
+      )}
 
-        {progress != null && (
-          <div style={{ width: 400, border: "1px solid #ccc", marginTop: 8 }}>
-            <div
-              style={{
-                width: `${progress}%`,
-                height: 16,
-                background: progress === 100 ? "#2e7d32" : "#4caf50",
-                transition: "width 0.3s ease"
-              }}
-            ></div>
-          </div>
-        )}
-      </div>
+      {progress != null && (
+        <div className="progress-container">
+          <div
+            className={
+              progress === 100
+                ? "progress-bar complete"
+                : "progress-bar"
+            }
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
+      )}
     </div>
   );
 }
