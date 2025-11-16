@@ -75,7 +75,9 @@ function Modal({ open, onClose, onSubmit, initial }) {
 }
 
 export default function Products() {
-  // ------------------ STATE ------------------
+
+  const API = import.meta.env.VITE_API_URL;   // ✅ IMPORTANT
+
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(0);
   const [limit] = useState(25);
@@ -88,7 +90,6 @@ export default function Products() {
     active: ""
   });
 
-  // Modal
   const [modalOpen, setModalOpen] = useState(false);
   const [modalInitial, setModalInitial] = useState(null);
 
@@ -105,7 +106,7 @@ export default function Products() {
     if (filters.active !== "") params.active = filters.active;
 
     try {
-      const res = await axios.get("/api/products", { params });
+      const res = await axios.get(`${API}/products`, { params });   // ✅ FIXED
       setProducts(res.data || []);
     } catch (e) {
       alert("Failed to fetch: " + (e.response?.data?.detail || e.message));
@@ -126,7 +127,7 @@ export default function Products() {
     setStatus("Deleting all products...");
 
     try {
-      await axios.delete("/api/products?confirm=true");
+      await axios.delete(`${API}/products?confirm=true`);   // ✅ FIXED
       alert("All products deleted successfully!");
 
       fetchProducts();
@@ -152,11 +153,9 @@ export default function Products() {
   async function onModalSubmit(form) {
     try {
       if (modalInitial) {
-        // Edit
-        await axios.put(`/api/products/${encodeURIComponent(modalInitial.sku)}`, form);
+        await axios.put(`${API}/products/${encodeURIComponent(modalInitial.sku)}`, form);   // FIXED
       } else {
-        // Create
-        await axios.post("/api/products", form);
+        await axios.post(`${API}/products`, form);   // FIXED
       }
       setModalOpen(false);
       fetchProducts();
@@ -170,14 +169,13 @@ export default function Products() {
     if (!window.confirm(`Delete product ${p.sku}?`)) return;
 
     try {
-      await axios.delete(`/api/products/${encodeURIComponent(p.sku)}`);
+      await axios.delete(`${API}/products/${encodeURIComponent(p.sku)}`);   // FIXED
       fetchProducts();
     } catch (e) {
       alert("Delete failed: " + (e.response?.data?.detail || e.message));
     }
   }
 
-  // ------------------ RENDER ------------------
   return (
     <div>
       <h2>Products</h2>
@@ -185,18 +183,17 @@ export default function Products() {
       {status && <div style={{ marginBottom: 10, color: "blue" }}>{status}</div>}
 
       <div style={{ marginBottom: 10 }}>
+
         <input
           placeholder="SKU"
           value={filters.sku}
           onChange={(e) => setFilters({ ...filters, sku: e.target.value })}
         />
-
         <input
           placeholder="Name"
           value={filters.name}
           onChange={(e) => setFilters({ ...filters, name: e.target.value })}
         />
-
         <input
           placeholder="Description"
           value={filters.description}
@@ -240,6 +237,7 @@ export default function Products() {
         </button>
       </div>
 
+
       <table border="1" cellPadding="6" style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
@@ -271,9 +269,7 @@ export default function Products() {
 
           {products.length === 0 && (
             <tr>
-              <td colSpan={6} style={{ textAlign: "center" }}>
-                No products
-              </td>
+              <td colSpan={6} style={{ textAlign: "center" }}>No products</td>
             </tr>
           )}
         </tbody>
@@ -285,7 +281,6 @@ export default function Products() {
         <button onClick={() => setPage((p) => p + 1)}>Next</button>
       </div>
 
-      {/* Modal */}
       <Modal
         open={modalOpen}
         initial={modalInitial}

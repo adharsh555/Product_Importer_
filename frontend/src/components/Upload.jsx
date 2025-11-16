@@ -2,6 +2,8 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 
 export default function Upload() {
+  const API = import.meta.env.VITE_API_URL;   // ✅ IMPORTANT
+
   const [progress, setProgress] = useState(null);
   const [status, setStatus] = useState("");
   const [lastError, setLastError] = useState(null);
@@ -12,7 +14,7 @@ export default function Upload() {
     setLastError(null);
 
     try {
-      const res = await axios.post("/api/upload", form, {
+      const res = await axios.post(`${API}/upload`, form, {   // ✅ FIXED
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (ev) => {
           if (ev.total) {
@@ -47,11 +49,10 @@ export default function Upload() {
       setStatus("File uploaded. Processing started...");
       setProgress(null);
 
-      if (esRef.current) {
-        esRef.current.close();
-      }
+      if (esRef.current) esRef.current.close();
 
-      const es = new EventSource(`/api/events/${upload_id}`);
+      // ✅ FIXED SSE URL
+      const es = new EventSource(`${API}/events/${upload_id}`);
       esRef.current = es;
 
       es.onmessage = (ev) => {
@@ -79,9 +80,7 @@ export default function Upload() {
         setStatus("EventSource error");
       };
 
-    } catch (err) {
-      // Error already handled in doUpload()
-    }
+    } catch (err) {}
   }
 
   return (

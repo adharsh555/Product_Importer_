@@ -2,12 +2,19 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function Webhooks() {
+  // IMPORTANT: your backend base URL
+  const API = import.meta.env.VITE_API_URL;
+
   const [hooks, setHooks] = useState([]);
-  const [form, setForm] = useState({ url: "", event: "product.import", enabled: true });
+  const [form, setForm] = useState({
+    url: "",
+    event: "product.import",
+    enabled: true
+  });
 
   async function load() {
     try {
-      const res = await axios.get("/api/webhooks");
+      const res = await axios.get(`${API}/webhooks`);   // FIXED
       setHooks(res.data || []);
     } catch (err) {
       console.error(err);
@@ -15,11 +22,13 @@ export default function Webhooks() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   async function add() {
     try {
-      await axios.post("/api/webhooks", form);
+      await axios.post(`${API}/webhooks`, form);   // FIXED
       setForm({ url: "", event: "product.import", enabled: true });
       load();
     } catch (err) {
@@ -29,7 +38,7 @@ export default function Webhooks() {
 
   async function test(id) {
     try {
-      const res = await axios.post(`/api/webhooks/${id}/test`);
+      const res = await axios.post(`${API}/webhooks/${id}/test`);   // FIXED
       alert("Test response: " + JSON.stringify(res.data));
     } catch (e) {
       alert("Failed: " + (e.response?.data?.detail || e.message));
@@ -39,7 +48,7 @@ export default function Webhooks() {
   async function del(id) {
     if (!confirm("Delete?")) return;
     try {
-      await axios.delete(`/api/webhooks/${id}`);
+      await axios.delete(`${API}/webhooks/${id}`);   // FIXED
       load();
     } catch (e) {
       alert("Failed: " + (e.response?.data?.detail || e.message));
@@ -49,21 +58,44 @@ export default function Webhooks() {
   return (
     <div className="card container">
       <h2>Webhooks</h2>
+
       <div style={{ marginBottom: 8 }}>
-        <input placeholder="URL" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} />
-        <input placeholder="Event" value={form.event} onChange={(e) => setForm({ ...form, event: e.target.value })} />
+        <input
+          placeholder="URL"
+          value={form.url}
+          onChange={(e) => setForm({ ...form, url: e.target.value })}
+        />
+        <input
+          placeholder="Event"
+          value={form.event}
+          onChange={(e) => setForm({ ...form, event: e.target.value })}
+        />
+
         <label style={{ marginLeft: 8 }}>
-          <input type="checkbox" checked={form.enabled} onChange={(e) => setForm({ ...form, enabled: e.target.checked })} /> Enabled
+          <input
+            type="checkbox"
+            checked={form.enabled}
+            onChange={(e) => setForm({ ...form, enabled: e.target.checked })}
+          />
+          Enabled
         </label>
-        <button onClick={add} style={{ marginLeft: 8 }}>Add</button>
+
+        <button onClick={add} style={{ marginLeft: 8 }}>
+          Add
+        </button>
       </div>
 
       <ul>
-        {hooks.map(h => (
+        {hooks.map((h) => (
           <li key={h.id} style={{ marginBottom: 6 }}>
-            <strong>{h.id}:</strong> {h.url} ({h.event}) [{h.enabled ? "enabled" : "disabled"}]
-            <button onClick={() => test(h.id)} style={{ marginLeft: 8 }}>Test</button>
-            <button onClick={() => del(h.id)} style={{ marginLeft: 6 }}>Delete</button>
+            <strong>{h.id}:</strong> {h.url} ({h.event}) [
+            {h.enabled ? "enabled" : "disabled"}]
+            <button onClick={() => test(h.id)} style={{ marginLeft: 8 }}>
+              Test
+            </button>
+            <button onClick={() => del(h.id)} style={{ marginLeft: 6 }}>
+              Delete
+            </button>
           </li>
         ))}
       </ul>
