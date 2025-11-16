@@ -3,9 +3,6 @@ import axios from "axios";
 import { apiUrl } from "../services/api";
 
 export default function Upload() {
-  // Backend root: must be like → https://product-importer-production-xxxx.up.railway.app/api
-  
-
   const [progress, setProgress] = useState(null);
   const [status, setStatus] = useState("");
   const [lastError, setLastError] = useState(null);
@@ -36,12 +33,12 @@ export default function Upload() {
     }
   }
 
-  // ------------------------- HANDLE FORM SUBMIT -------------------------
+  // ------------------------- HANDLE SUBMIT -------------------------
   async function handleSubmit(e) {
     e.preventDefault();
 
     const file = e.target.file.files[0];
-    if (!file) return alert("Choose CSV file");
+    if (!file) return alert("Please select a CSV file.");
 
     const form = new FormData();
     form.append("file", file);
@@ -50,14 +47,12 @@ export default function Upload() {
       const data = await doUpload(form);
       const upload_id = data.upload_id;
 
-      setStatus("File uploaded. Processing started...");
+      setStatus("File uploaded. Processing has started...");
       setProgress(null);
 
-      if (esRef.current) {
-        esRef.current.close();
-      }
+      if (esRef.current) esRef.current.close();
 
-      // 🔥 IMPORTANT: SSE must use the FULL API URL
+      // Server-Sent Events (SSE)
       const es = new EventSource(`${apiUrl}/api/events/${upload_id}`);
       esRef.current = es;
 
@@ -70,24 +65,30 @@ export default function Upload() {
             setProgress(pct);
             setStatus(`${d.status} - ${d.processed}/${d.total}`);
           } else {
-            setStatus(JSON.stringify(d));
+            setStatus(d.status);
           }
-        } else if (d.status === "complete") {
+        } 
+        
+        // Processing complete
+        else if (d.status === "complete") {
           setProgress(100);
-          setStatus(`Complete: ${d.processed}/${d.total}`);
+          setStatus("Import completed. You can view the results on the Products page.");
           es.close();
-        } else if (d.status === "error") {
+        } 
+        
+        // Processing error
+        else if (d.status === "error") {
           setStatus("Error: " + d.message);
           es.close();
         }
       };
 
       es.onerror = () => {
-        setStatus("EventSource error");
+        setStatus("Connection error while receiving updates.");
       };
 
     } catch (err) {
-      // error already shown in doUpload()
+      // Error already handled
     }
   }
 
@@ -102,21 +103,22 @@ export default function Upload() {
       </form>
 
       <div style={{ marginTop: 10 }}>
-        <div>{status}</div>
+        <div style={{ fontWeight: "500" }}>{status}</div>
 
         {lastError && (
-          <div>
+          <div style={{ marginTop: 8 }}>
             <button onClick={() => setLastError(null)}>Retry Upload</button>
           </div>
         )}
 
         {progress != null && (
-          <div style={{ width: 400, border: "1px solid #ccc", marginTop: 5 }}>
+          <div style={{ width: 400, border: "1px solid #ccc", marginTop: 8 }}>
             <div
               style={{
                 width: `${progress}%`,
                 height: 16,
-                background: "#4caf50"
+                background: progress === 100 ? "#2e7d32" : "#4caf50",
+                transition: "width 0.3s ease"
               }}
             ></div>
           </div>
