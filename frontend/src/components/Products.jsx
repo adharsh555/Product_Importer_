@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { apiUrl } from "../services/api";
 
-// ------------------------- MODAL COMPONENT -------------------------
 function Modal({ open, onClose, onSubmit, initial }) {
   const [form, setForm] = useState(
     initial || { sku: "", name: "", description: "", price: "", active: true }
@@ -16,77 +15,83 @@ function Modal({ open, onClose, onSubmit, initial }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-box">
-        <h3>{initial ? "Edit Product" : "Create Product"}</h3>
+      <div className="modal-content fade-in">
+        <h3 style={{ marginBottom: "1.5rem" }}>{initial ? "Edit Product" : "Create Product"}</h3>
 
-        <input
-          className="modal-input"
-          placeholder="SKU"
-          value={form.sku}
-          onChange={(e) => setForm({ ...form, sku: e.target.value })}
-        />
+        <div style={{ display: "grid", gap: "1rem" }}>
+          <div>
+            <label style={{ fontSize: "0.875rem", fontWeight: "500", color: "var(--text-secondary)" }}>SKU</label>
+            <input
+              className="form-input"
+              placeholder="e.g. PROD-001"
+              value={form.sku}
+              onChange={(e) => setForm({ ...form, sku: e.target.value })}
+            />
+          </div>
 
-        <input
-          className="modal-input"
-          placeholder="Name"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-        />
+          <div>
+            <label style={{ fontSize: "0.875rem", fontWeight: "500", color: "var(--text-secondary)" }}>Product Name</label>
+            <input
+              className="form-input"
+              placeholder="e.g. Acme Widget"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
+          </div>
 
-        <input
-          className="modal-input"
-          placeholder="Description"
-          value={form.description}
-          onChange={(e) => setForm({ ...form, description: e.target.value })}
-        />
+          <div>
+            <label style={{ fontSize: "0.875rem", fontWeight: "500", color: "var(--text-secondary)" }}>Description</label>
+            <textarea
+              className="form-input"
+              style={{ minHeight: "80px" }}
+              placeholder="Brief description..."
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+            />
+          </div>
 
-        <input
-          className="modal-input"
-          placeholder="Price"
-          value={form.price}
-          onChange={(e) => setForm({ ...form, price: e.target.value })}
-        />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+            <div>
+              <label style={{ fontSize: "0.875rem", fontWeight: "500", color: "var(--text-secondary)" }}>Price ($)</label>
+              <input
+                className="form-input"
+                type="number"
+                placeholder="0.00"
+                value={form.price}
+                onChange={(e) => setForm({ ...form, price: e.target.value })}
+              />
+            </div>
+            <div style={{ display: "flex", alignItems: "flex-end", paddingBottom: "8px" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "0.875rem" }}>
+                <input
+                  type="checkbox"
+                  checked={form.active}
+                  onChange={(e) => setForm({ ...form, active: e.target.checked })}
+                />
+                Active
+              </label>
+            </div>
+          </div>
+        </div>
 
-        <label>
-          <input
-            type="checkbox"
-            checked={form.active}
-            onChange={(e) => setForm({ ...form, active: e.target.checked })}
-          />
-          {" "}Active
-        </label>
-
-        <div className="modal-actions">
-          <button className="save-button" onClick={() => onSubmit(form)}>
-            Save
-          </button>
-          <button className="cancel-button" onClick={onClose}>
-            Cancel
-          </button>
+        <div style={{ marginTop: "2rem", display: "flex", gap: "1rem", justifyContent: "flex-end" }}>
+          <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
+          <button className="btn btn-primary" onClick={() => onSubmit(form)}>Save Changes</button>
         </div>
       </div>
     </div>
   );
 }
 
-// ------------------------- PRODUCTS PAGE -------------------------
 export default function Products() {
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(0);
-  const [limit] = useState(25);
+  const [limit] = useState(10); // Reduced limit for cleaner dashboard feel
   const [status, setStatus] = useState("");
-
-  const [filters, setFilters] = useState({
-    sku: "",
-    name: "",
-    description: "",
-    active: ""
-  });
-
+  const [filters, setFilters] = useState({ sku: "", name: "", description: "", active: "" });
   const [modalOpen, setModalOpen] = useState(false);
   const [modalInitial, setModalInitial] = useState(null);
 
-  // ------------------------- FETCH PRODUCTS -------------------------
   async function fetchProducts() {
     const params = {
       skip: page * limit,
@@ -95,48 +100,19 @@ export default function Products() {
       name: filters.name,
       description: filters.description
     };
-
     if (filters.active !== "") params.active = filters.active;
 
     try {
       const res = await axios.get(`${apiUrl}/api/products`, { params });
       setProducts(res.data || []);
     } catch (e) {
-      alert("Failed to fetch: " + (e.response?.data?.detail || e.message));
+      console.error(e);
     }
   }
 
   useEffect(() => {
     fetchProducts();
   }, [page]);
-
-  // ------------------------- DELETE ALL -------------------------
-  async function handleDeleteAll() {
-    if (!window.confirm("Are you sure you want to delete ALL products?")) return;
-
-    setStatus("Deleting all products...");
-
-    try {
-      await axios.delete(`${apiUrl}/api/products?confirm=true`);
-      alert("All products deleted successfully!");
-      fetchProducts();
-      setStatus("");
-    } catch (err) {
-      alert("Failed to delete: " + err.message);
-      setStatus("");
-    }
-  }
-
-  // ------------------------- MODAL ACTIONS -------------------------
-  function createProductModal() {
-    setModalInitial(null);
-    setModalOpen(true);
-  }
-
-  function editProductModal(p) {
-    setModalInitial(p);
-    setModalOpen(true);
-  }
 
   async function onModalSubmit(form) {
     try {
@@ -148,132 +124,107 @@ export default function Products() {
       setModalOpen(false);
       fetchProducts();
     } catch (e) {
-      alert("Save failed: " + (e.response?.data?.detail || e.message));
+      alert("Error: " + (e.response?.data?.detail || e.message));
     }
   }
 
   async function deleteProduct(p) {
     if (!window.confirm(`Delete product ${p.sku}?`)) return;
-
     try {
       await axios.delete(`${apiUrl}/api/products/${encodeURIComponent(p.sku)}`);
       fetchProducts();
     } catch (e) {
-      alert("Delete failed: " + (e.response?.data?.detail || e.message));
+      alert("Delete failed.");
     }
   }
 
-  // ------------------------- UI -------------------------
   return (
-    <div className="products-container">
-      <h2 className="products-title">Products</h2>
-
-      {status && <div className="status-message">{status}</div>}
-
-      {/* Filters */}
-      <div className="filter-row">
-        <input
-          className="products-input"
-          placeholder="SKU"
-          value={filters.sku}
-          onChange={(e) => setFilters({ ...filters, sku: e.target.value })}
-        />
-
-        <input
-          className="products-input"
-          placeholder="Name"
-          value={filters.name}
-          onChange={(e) => setFilters({ ...filters, name: e.target.value })}
-        />
-
-        <input
-          className="products-input"
-          placeholder="Description"
-          value={filters.description}
-          onChange={(e) => setFilters({ ...filters, description: e.target.value })}
-        />
-
-        <select
-          className="products-select"
-          value={filters.active}
-          onChange={(e) => setFilters({ ...filters, active: e.target.value })}
-        >
-          <option value="">Any</option>
-          <option value="true">Active</option>
-          <option value="false">Inactive</option>
-        </select>
-
-        <button className="products-button" onClick={() => { setPage(0); fetchProducts(); }}>
-          Filter
-        </button>
-
-        <button className="products-button clear-button" onClick={() => {
-          setFilters({ sku: "", name: "", description: "", active: "" });
-          setPage(0);
-          fetchProducts();
-        }}>
-          Clear
-        </button>
-
-        <button className="products-button create-button" onClick={createProductModal}>
-          Create
-        </button>
-
-        <button className="products-button delete-all-button" onClick={handleDeleteAll}>
-          Delete All
-        </button>
+    <div className="fade-in">
+      <div className="card" style={{ marginBottom: "1.5rem" }}>
+        <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", alignItems: "center" }}>
+          <input
+            className="form-input"
+            style={{ width: "150px" }}
+            placeholder="Search SKU"
+            value={filters.sku}
+            onChange={(e) => setFilters({ ...filters, sku: e.target.value })}
+          />
+          <input
+            className="form-input"
+            style={{ width: "200px" }}
+            placeholder="Product Name"
+            value={filters.name}
+            onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+          />
+          <select
+            className="form-input"
+            style={{ width: "130px" }}
+            value={filters.active}
+            onChange={(e) => setFilters({ ...filters, active: e.target.value })}
+          >
+            <option value="">All Status</option>
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+          <button className="btn btn-secondary" onClick={() => { setPage(0); fetchProducts(); }}>Filter</button>
+          <button className="btn btn-primary" style={{ marginLeft: "auto" }} onClick={() => { setModalInitial(null); setModalOpen(true); }}>
+            + Create Product
+          </button>
+        </div>
       </div>
 
-      {/* Table */}
-      <table className="products-table">
-        <thead>
-          <tr>
-            <th>SKU</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Price</th>
-            <th>Active</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+      <div className="card" style={{ padding: "0" }}>
+        <div className="data-table-container">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>Product Information</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th style={{ textAlign: "right" }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((p) => (
+                <tr key={p.sku}>
+                  <td style={{ fontWeight: "600", color: "var(--text-secondary)" }}>{p.sku}</td>
+                  <td>
+                    <div style={{ fontWeight: "500" }}>{p.name}</div>
+                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>{p.description?.substring(0, 50)}...</div>
+                  </td>
+                  <td>${parseFloat(p.price).toFixed(2)}</td>
+                  <td>
+                    <span className={`badge ${p.active ? "badge-success" : "badge-gray"}`}>
+                      {p.active ? "Active" : "Inactive"}
+                    </span>
+                  </td>
+                  <td style={{ textAlign: "right" }}>
+                    <button className="btn btn-secondary" style={{ padding: "4px 8px", marginRight: "8px" }} onClick={() => { setModalInitial(p); setModalOpen(true); }}>Edit</button>
+                    <button className="btn btn-secondary" style={{ padding: "4px 8px", color: "var(--error)" }} onClick={() => deleteProduct(p)}>Delete</button>
+                  </td>
+                </tr>
+              ))}
+              {products.length === 0 && (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: "center", padding: "4rem", color: "var(--text-muted)" }}>
+                    No products found matching your criteria.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-        <tbody>
-          {products.map((p) => (
-            <tr key={p.sku}>
-              <td>{p.sku}</td>
-              <td>{p.name}</td>
-              <td>{p.description}</td>
-              <td>{p.price}</td>
-              <td>{String(p.active)}</td>
-              <td>
-                <button className="action-button" onClick={() => editProductModal(p)}>
-                  Edit
-                </button>
-                <button className="action-button delete-button" onClick={() => deleteProduct(p)}>
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-
-          {products.length === 0 && (
-            <tr>
-              <td colSpan={6} style={{ textAlign: "center" }}>
-                No products
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-
-      {/* Pagination */}
-      <div className="pagination">
-        <button onClick={() => page > 0 && setPage((p) => p - 1)}>Prev</button>
-        <span>Page {page + 1}</span>
-        <button onClick={() => setPage((p) => p + 1)}>Next</button>
+        <div style={{ padding: "1rem", display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid var(--border-light)" }}>
+          <span style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>Page {page + 1}</span>
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <button className="btn btn-secondary" style={{ padding: "4px 12px" }} disabled={page === 0} onClick={() => setPage(p => p - 1)}>Previous</button>
+            <button className="btn btn-secondary" style={{ padding: "4px 12px" }} disabled={products.length < limit} onClick={() => setPage(p => p + 1)}>Next</button>
+          </div>
+        </div>
       </div>
 
-      {/* Modal */}
       <Modal open={modalOpen} initial={modalInitial} onClose={() => setModalOpen(false)} onSubmit={onModalSubmit} />
     </div>
   );
